@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard KKJU — Pemprosesan Makanan</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="brand">
+      <div>
+        <span class="brand-text">🎓 KKJU — Sijil Khas Pemprosesan Makanan</span>
+        <span class="brand-sub">Kolej Komuniti Jelebu</span>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html" class="active">Dashboard</a>
+      <a href="pelajar.html">Pelajar</a>
+      <a href="aktiviti.html">Aktiviti</a>
+      <a href="industri.html">Industri</a>
+    </nav>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="page-wrapper">
+    <div class="page-title">📊 Dashboard Utama</div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👤</div>
+        <div class="stat-num" id="stat-pelajar">0</div>
+        <div class="stat-label">Jumlah Pelajar</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📋</div>
+        <div class="stat-num" id="stat-aktiviti">0</div>
+        <div class="stat-label">Jumlah Aktiviti</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon">✅</div>
+        <div class="stat-num" id="stat-selesai">0</div>
+        <div class="stat-label">Aktiviti Selesai</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">🏭</div>
+        <div class="stat-num" id="stat-industri">0</div>
+        <div class="stat-label">Kolaborasi Industri</div>
+      </div>
+    </div>
+
+    <!-- AKTIVITI TERKINI -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📋 Aktiviti Terkini</span>
+        <a href="aktiviti.html" class="btn btn-primary btn-sm">Lihat Semua</a>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl-aktiviti-terkini">
+          <thead>
+            <tr>
+              <th>Nama Aktiviti</th>
+              <th>Jenis</th>
+              <th>Tarikh</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-aktiviti"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INDUSTRI TERKINI -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🏭 Kolaborasi Industri Terkini</span>
+        <a href="industri.html" class="btn btn-primary btn-sm">Lihat Semua</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Syarikat</th>
+              <th>Jenis Program</th>
+              <th>Tarikh</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-industri"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    function statusBadge(s) {
+      if (s === 'Selesai')            return '<span class="badge badge-green">Selesai</span>';
+      if (s === 'Sedang Berlangsung') return '<span class="badge badge-blue">Sedang Berlangsung</span>';
+      if (s === 'Akan Datang')        return '<span class="badge badge-orange">Akan Datang</span>';
+      return '<span class="badge badge-gray">' + s + '</span>';
+    }
+
+    function render() {
+      const pelajar  = DB.getPelajar();
+      const aktiviti = DB.getAktiviti();
+      const industri = DB.getIndustri();
+
+      document.getElementById('stat-pelajar').textContent  = pelajar.length;
+      document.getElementById('stat-aktiviti').textContent = aktiviti.length;
+      document.getElementById('stat-selesai').textContent  = aktiviti.filter(a => a.status === 'Selesai').length;
+      document.getElementById('stat-industri').textContent = industri.length;
+
+      // Aktiviti terkini (5 terakhir)
+      const tbodyA = document.getElementById('tbody-aktiviti');
+      const terkiniA = [...aktiviti].reverse().slice(0, 5);
+      if (terkiniA.length === 0) {
+        tbodyA.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px">Tiada aktiviti lagi.</td></tr>';
+      } else {
+        tbodyA.innerHTML = terkiniA.map(a => `
+          <tr>
+            <td>${a.nama}</td>
+            <td>${a.jenis}</td>
+            <td>${a.tarikh}</td>
+            <td>${statusBadge(a.status)}</td>
+          </tr>`).join('');
+      }
+
+      // Industri terkini (5 terakhir)
+      const tbodyI = document.getElementById('tbody-industri');
+      const terkiniI = [...industri].reverse().slice(0, 5);
+      if (terkiniI.length === 0) {
+        tbodyI.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#9ca3af;padding:24px">Tiada rekod industri lagi.</td></tr>';
+      } else {
+        tbodyI.innerHTML = terkiniI.map(i => `
+          <tr>
+            <td>${i.nama}</td>
+            <td>${i.jenis}</td>
+            <td>${i.tarikh}</td>
+          </tr>`).join('');
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
